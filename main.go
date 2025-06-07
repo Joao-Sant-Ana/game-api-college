@@ -2,6 +2,7 @@ package main
 
 import (
 	"c02-project/config"
+	"c02-project/internals/routes"
 	"log"
 
 	"github.com/joho/godotenv"
@@ -14,4 +15,6 @@ func main() {
 
 	router := config.StartGin()
 	db := config.ConnectDB()
+
+	routes.SetupRoutes(router, db)
 }

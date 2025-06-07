@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Routes(r *gin.Engine, db *gorm.DB) {
+func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	userHandler := handlers.NewUserHandler(db)
 
 	r.GET("/users", userHandler.GetUsers())
