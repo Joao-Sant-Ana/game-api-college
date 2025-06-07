@@ -1,0 +1,171 @@
+definitions:
+  handlers.userCreate:
+    properties:
+      name:
+        example: joao
+        type: string
+    type: object
+  handlers.userUpdate:
+    properties:
+      name:
+        example: joao
+        type: string
+      wave:
+        example: 10
+        type: integer
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      wave:
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: Simple API for a game made in construct3
+  title: Game API
+  version: "1.0"
+paths:
+  /users:
+    get:
+      description: Returns up to 20 users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get list of users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Creates a user with the given JSON body
+      parameters:
+      - description: User to create
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.userCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new user
+      tags:
+      - users
+  /users/verify/{name}:
+    get:
+      description: Verifies if a username already exists
+      parameters:
+      - description: Username to check
+        in: path
+        name: name
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content, name available
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Check if username is taken
+      tags:
+      - users
+  /users/waves:
+    put:
+      consumes:
+      - application/json
+      description: Updates the wave field for a user by name
+      parameters:
+      - description: Update payload
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.userUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update user's wave field
+      tags:
+      - users
+swagger: "2.0"

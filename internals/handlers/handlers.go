@@ -13,12 +13,30 @@ type UserHandler struct {
 	db *gorm.DB
 }
 
+type userUpdate struct {
+	Name string `json:"name" example:"joao"`
+	Wave int `json:"wave" example:"10"`
+}
+
+type userCreate struct {
+	Name string `json:"name" example:"joao"`
+}
+
 func NewUserHandler(db *gorm.DB) *UserHandler {
 	return &UserHandler{
 		db: db,
 	}
 }
 
+// GetUsers godoc
+// @Summary      Get list of users
+// @Description  Returns up to 20 users
+// @Tags         users
+// @Produce      json
+// @Success      200  {object}  []models.User
+// @Failure      404  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /users [get]
 func (u *UserHandler) GetUsers() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var users []models.User
@@ -42,6 +60,16 @@ func (u *UserHandler) GetUsers() gin.HandlerFunc {
 	}
 }
 
+// VerifyName godoc
+// @Summary      Check if username is taken
+// @Description  Verifies if a username already exists
+// @Tags         users
+// @Param        name   path      string  true  "Username to check"
+// @Success      204    "No Content, name available"
+// @Failure      400    {object}  map[string]string
+// @Failure      409    {object}  map[string]string
+// @Failure      500    {object}  map[string]string
+// @Router       /users/verify/{name} [get]
 func (u *UserHandler) VerifyName() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Param("name")
@@ -71,6 +99,17 @@ func (u *UserHandler) VerifyName() gin.HandlerFunc {
 	}
 }
 
+// CreateUser godoc
+// @Summary      Create a new user
+// @Description  Creates a user with the given JSON body
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        user  body      userCreate  true  "User to create"
+// @Success      200   {object}  map[string]string
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /users [post]
 func (u *UserHandler) CreateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
@@ -94,11 +133,23 @@ func (u *UserHandler) CreateUser() gin.HandlerFunc {
 	}
 }
 
+// UpdateWaves godoc
+// @Summary      Update user's wave field
+// @Description  Updates the wave field for a user by name
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        input  body      userUpdate  true  "Update payload"
+// @Success      200    {object}  map[string]string
+// @Failure      400    {object}  map[string]string
+// @Failure      404    {object}  map[string]string
+// @Failure      500    {object}  map[string]string
+// @Router       /users/waves [put]
 func (u *UserHandler) UpdateWaves() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var input struct {
 			Name string `json:"name"`
-			Wave string `json:"wave"`
+			Wave int `json:"wave"`
 		}
 		if err := c.BindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
