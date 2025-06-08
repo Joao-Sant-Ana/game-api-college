@@ -22,6 +22,6 @@ func main() {
 	routes.SetupRoutes(router, db)
 
 	if err := router.Run(":8080"); err != nil {
-	log.Fatalf("Error starting API: %v", err)
+		log.Fatalf("Error starting API: %v", err)
 	}
 }
