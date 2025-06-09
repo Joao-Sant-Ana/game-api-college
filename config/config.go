@@ -4,11 +4,12 @@ import (
 	"c02-project/internals/models"
 	"log"
 	"os"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"github.com/gin-contrib/cors"
 )
 
 func readEnv(key, defaultValue string) string {
