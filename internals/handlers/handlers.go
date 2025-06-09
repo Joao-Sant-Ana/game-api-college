@@ -109,7 +109,7 @@ func (u *UserHandler) VerifyName() gin.HandlerFunc {
 // @Success      200   {object}  map[string]string
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
-// @Router       /users [post]
+// @Router       /user [post]
 func (u *UserHandler) CreateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user models.User
