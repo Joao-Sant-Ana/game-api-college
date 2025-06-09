@@ -144,7 +144,7 @@ func (u *UserHandler) CreateUser() gin.HandlerFunc {
 // @Failure      400    {object}  map[string]string
 // @Failure      404    {object}  map[string]string
 // @Failure      500    {object}  map[string]string
-// @Router       /users/waves [put]
+// @Router       /users/waves [patch]
 func (u *UserHandler) UpdateWaves() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var input struct {
