@@ -1,4 +1,34 @@
 definitions:
+  handlers.ErrorBadRequest:
+    properties:
+      message:
+        example: Invalid request body
+        type: string
+    type: object
+  handlers.ErrorConflict:
+    properties:
+      message:
+        example: Name already in use
+        type: string
+    type: object
+  handlers.ErrorInternalServer:
+    properties:
+      message:
+        example: Internal server error
+        type: string
+    type: object
+  handlers.ErrorNotFound:
+    properties:
+      message:
+        example: User not found
+        type: string
+    type: object
+  handlers.SuccessResponse:
+    properties:
+      message:
+        example: Operation successful
+        type: string
+    type: object
   handlers.userCreate:
     properties:
       name:
@@ -31,33 +61,7 @@ info:
   title: Game API
   version: "1.0"
 paths:
-  /users:
-    get:
-      description: Returns up to 20 users
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.User'
-            type: array
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get list of users
-      tags:
-      - users
+  /user:
     post:
       consumes:
       - application/json
@@ -73,24 +77,43 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.SuccessResponse'
         "400":
-          description: Bad Request
+          description: Invalid body error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.ErrorBadRequest'
         "500":
-          description: Internal Server Error
+          description: Database error
+          schema:
+            $ref: '#/definitions/handlers.ErrorInternalServer'
+      summary: Create a new user
+      tags:
+      - users
+  /users:
+    get:
+      description: Returns up to 20 users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: users
           schema:
             additionalProperties:
-              type: string
+              items:
+                $ref: '#/definitions/models.User'
+              type: array
             type: object
-      summary: Create a new user
+        "404":
+          description: No users found message
+          schema:
+            $ref: '#/definitions/handlers.ErrorNotFound'
+        "500":
+          description: Database error message
+          schema:
+            $ref: '#/definitions/handlers.ErrorInternalServer'
+      summary: Get list of users
       tags:
       - users
   /users/verify/{name}:
@@ -106,28 +129,22 @@ paths:
         "204":
           description: No Content, name available
         "400":
-          description: Bad Request
+          description: Missing name error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.ErrorBadRequest'
         "409":
-          description: Conflict
+          description: Name already in use
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.ErrorConflict'
         "500":
-          description: Internal Server Error
+          description: Database error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.ErrorInternalServer'
       summary: Check if username is taken
       tags:
       - users
   /users/waves:
-    put:
+    patch:
       consumes:
       - application/json
       description: Updates the wave field for a user by name
@@ -142,29 +159,21 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: User updated message
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.SuccessResponse'
         "400":
-          description: Bad Request
+          description: Invalid body error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.ErrorBadRequest'
         "404":
-          description: Not Found
+          description: User not found error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.ErrorNotFound'
         "500":
-          description: Internal Server Error
+          description: Database error
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/handlers.ErrorInternalServer'
       summary: Update user's wave field
       tags:
       - users

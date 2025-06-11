@@ -15,46 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/users": {
-            "get": {
-                "description": "Returns up to 20 users",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Get list of users",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.User"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
+        "/user": {
             "post": {
                 "description": "Creates a user with the given JSON body",
                 "consumes": [
@@ -80,30 +41,59 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid body error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.ErrorBadRequest"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorInternalServer"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "Returns up to 20 users",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get list of users",
+                "responses": {
+                    "200": {
+                        "description": "users",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/models.User"
+                                }
                             }
+                        }
+                    },
+                    "404": {
+                        "description": "No users found message",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorNotFound"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error message",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ErrorInternalServer"
                         }
                     }
                 }
@@ -130,37 +120,28 @@ const docTemplate = `{
                         "description": "No Content, name available"
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Missing name error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.ErrorBadRequest"
                         }
                     },
                     "409": {
-                        "description": "Conflict",
+                        "description": "Name already in use",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.ErrorConflict"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Database error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.ErrorInternalServer"
                         }
                     }
                 }
             }
         },
         "/users/waves": {
-            "put": {
+            "patch": {
                 "description": "Updates the wave field for a user by name",
                 "consumes": [
                     "application/json"
@@ -185,39 +166,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "User updated message",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.SuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid body error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.ErrorBadRequest"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "User not found error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.ErrorNotFound"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Database error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/handlers.ErrorInternalServer"
                         }
                     }
                 }
@@ -225,6 +194,51 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handlers.ErrorBadRequest": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Invalid request body"
+                }
+            }
+        },
+        "handlers.ErrorConflict": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Name already in use"
+                }
+            }
+        },
+        "handlers.ErrorInternalServer": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Internal server error"
+                }
+            }
+        },
+        "handlers.ErrorNotFound": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "User not found"
+                }
+            }
+        },
+        "handlers.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Operation successful"
+                }
+            }
+        },
         "handlers.userCreate": {
             "type": "object",
             "properties": {
